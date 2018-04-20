@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import pdb
 import csv
 import random
+from pprint import pprint
 
 def parse_schema(filename):
     xml = ET.parse(args.schema_file)
@@ -56,7 +57,7 @@ def print_tree(node, edge, indent):
 
 def generate(D, A, threshold):
     klass = D[0][1]
-    if all(d[0][1] == klass for d in D):
+    if all(d[1] == klass for d in D):
         return Node("class", klass)
     elif all(a is None for a in A):
         # TODO picks first klass in D, should find most frequent
@@ -71,7 +72,9 @@ def generate(D, A, threshold):
         A[selected_idx] = None
         node = Node("attribute", selected[0])
         for e in range(1, selected[1] + 1):
-            node.children[e] = generate(D, list(A), threshold)
+            new_data = [d for d in D if d[0][selected_idx] == e]
+            if new_data:
+                node.children[e] = generate(new_data, list(A), threshold)
         return node
 
 
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
  
     schema = parse_schema(args.schema_file)
-    data, attributes, klass = parse_data(args.data_file)
+    data, attributes, category = parse_data(args.data_file)
 
     root = generate(data, list(attributes), 0.0)
-    print_tree(root, None, 0)
+    print_tree(root, "", 0)
