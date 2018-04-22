@@ -52,27 +52,52 @@ class Node:
         self.label = label
         self.children = {}
 
-    def to_s(self, edge, indent):
-        return " " * 2 * indent + "({}) {} {}".format(edge, self.node_type, self.label)
+    def to_s(self, edge, indent, attr, schema, classes):
+        if edge:
+            edge = "({}) ".format(attr[edge - 1]['name'])
+        else:
+            edge = ""
+        if self.node_type == "class":
+            label = classes[self.label - 1]['name']
+        else:
+            label = self.label
+        return " " * 2 * indent + "{}{} {}".format(edge, self.node_type, label)
 
+    def to_json(self):
+        raise "NYI"
 
-def print_tree(node, edge, indent):
-    print(node.to_s(edge, indent))
+def print_tree(node, edge, indent, attr, schema, classes):
+    print(node.to_s(edge, indent, attr, schema, classes))
     for e, n in node.children.items():
-        print_tree(n, e, indent + 1)
+        print_tree(n, e, indent + 1, schema[node.label], schema, classes)
+
+def to_json(node):
+    raise "NYI"
+
+def dominant_class(D):
+    classes = {}
+    for d in D:
+        if d[1] in classes:
+            classes[d[1]] = classes[d[1]] + 1
+        else:
+            classes[d[1]] = 1
+    return max(classes)
 
 def generate(D, A, threshold):
     klass = D[0][1]
     if all(d[1] == klass for d in D):
         return Node("class", klass)
     elif all(a is None for a in A):
-        # TODO picks first klass in D, should find plurality instead
+        klass = dominant_class(D)
         return Node("class", klass)
     else:
         selected_attr, selected_idx = selectSplittingAttribute(A,D,threshold)
+        if not selected_idx:
+            klass = dominant_class(D)
+            return Node("class", klass)
         #selected_idx = random.randint(0, len(A) - 1)
-        while not A[selected_idx]:
-            selected_idx = random.randint(0, len(A) - 1)
+        #while not A[selected_idx]:
+        #    selected_idx = random.randint(0, len(A) - 1)
 
         # The selected attribute is set to None in the attribute list
         # this preserves the capability to parallel index into data vector
@@ -91,9 +116,10 @@ if __name__ == "__main__":
     parser.add_argument("schema_file", help="xml file containing names")
     parser.add_argument("data_file", help="csv file containing numeric data")
     args = parser.parse_args()
- 
+
     schema = parse_schema(args.schema_file)
     data, attributes, category = parse_data(args.data_file)
 
     root = generate(data, list(attributes), 0.0)
-    print_tree(root, "", 0)
+    print_tree(root, "", 0, {}, schema, schema[category])
+
