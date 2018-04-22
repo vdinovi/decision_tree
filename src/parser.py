@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import pdb
 import csv
 import random
+from splitting import selectSplittingAttribute
 from pprint import pprint
 
 # Parse the schema XML file -> dictionary
@@ -68,8 +69,8 @@ def generate(D, A, threshold):
         # TODO picks first klass in D, should find plurality instead
         return Node("class", klass)
     else:
-        # TODO selects random splitting attribute, should use correct algorithm instead
-        selected_idx = random.randint(0, len(A) - 1)
+        selected_attr, selected_idx = selectSplittingAttribute(A,D,threshold)
+        #selected_idx = random.randint(0, len(A) - 1)
         while not A[selected_idx]:
             selected_idx = random.randint(0, len(A) - 1)
 

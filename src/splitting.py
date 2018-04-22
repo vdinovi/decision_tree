@@ -1,4 +1,5 @@
 from math import log
+import pdb
 
 GAIN = True
 GAIN_RATIO = False
@@ -9,9 +10,9 @@ def countAttributeValues(D,a):
    for datum in D:
       currentValue = datum[0][a]
       if currentValue not in counts:
-         currentValue = 1
+         counts[currentValue] = 1
       else:
-         currentValue += 1
+         counts[currentValue] += 1
       total += 1
    return counts, total
 
@@ -19,10 +20,11 @@ def countClassAttributeValues(D):
    counts = {}
    total = 0
    for datum in D:
-      if datum[1] not in counts:
-         counts[datum[1]] = 1
+      currentValue = datum[1]
+      if currentValue not in counts:
+         counts[currentValue] = 1
       else:
-         counts[datum[1]] += 1
+         counts[currentValue] += 1
       total+=1
    return counts,total
 
@@ -37,7 +39,7 @@ def splitDataSet(D,a):
    d = dict((count,[]) for count in counts)
    for datum in D:
       curr = datum[0][a]
-      d[curr] += datum
+      d[curr].append(datum)
    return d
 
 '''entropy
@@ -80,6 +82,12 @@ def findMax(dct):
          maxKey = key
    return maxKey
 
+def getAttrIndex(A,a):
+   for i,attr in enumerate(A):
+      if (attr is not None) and attr[0] == a:
+         return i
+   return Null
+
 '''selectSplittingAttribute
 A         : a list of attributes
 D         : the training dataset
@@ -91,12 +99,12 @@ def selectSplittingAttribute(A,D,threshold,isgain=True):
    gains = {}
    gainRatios = {}
    for a,attr in enumerate(A):
-      attr = attr[0]
-      print(attr)
-      gains[attr] = gain(D,a)
-      gainRatios[attr] = gainRatio(D,a)
+      if(attr is not None):
+         attr = attr[0]
+         gains[attr] = gain(D,a)
+         gainRatios[attr] = gainRatio(D,a)
    best = findMax(gains) if isgain else findMax(gainRatios)
    if gains[best] > threshold:
-      return best
+      return best, getAttrIndex(A,best)
    else:
-      return Null
+      return Null,Null
