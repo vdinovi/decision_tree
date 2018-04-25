@@ -66,11 +66,13 @@ def gain(D,a):
 
 def gainRatio(D,a):
     num = gain(D,a)
-    denom = 1
+    denom = 0
     splitted = splitDataSet(D,a)
     for lst in list(splitted.values()):
         pr = float(len(lst))/len(D)
         denom -= pr*log(pr,2)
+    if(denom == 0):
+       denom = .0000001
     return float(num)/denom
 
 def findMax(dct):
