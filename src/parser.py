@@ -102,9 +102,8 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-def cross_validate(data, attributes, target, threshold, gain_ratio):
+def cross_validate(data, attributes, target, threshold, gain_ratio, beta):
     num_folds = 10
-    scores = []
     attrs = [a[0] for a in attributes]
     partitions = [chunk for chunk in chunks(data, num_folds)]
     confusion_mat = [[0, 0], [0, 0]] #target (row) x non-target (col)
@@ -119,7 +118,7 @@ def cross_validate(data, attributes, target, threshold, gain_ratio):
         accuracies.append(accuracy(actual, expected))
     avg_accuracy = sum(accuracies) / float(len(accuracies))
     overall_accuracy = float(confusion_mat[0][0] + confusion_mat[1][1]) / (confusion_mat[0][0] + confusion_mat[0][1] + confusion_mat[1][0] + confusion_mat[1][1])
-    precision, recall, f_measure = eval_f_measure(confusion_mat, 1)
+    precision, recall, f_measure = eval_f_measure(confusion_mat, beta)
     stats =  {
         "confusion_mat": confusion_mat,
         "precision": precision,
@@ -134,6 +133,7 @@ def print_stats(stats, params):
     print("-------------- Stats --------------")
     print("Gain Ratio: {}".format(params["gain_ratio"]))
     print("Threshold: {}".format(params["threshold"]))
+    print("Beta: {}".format(params["beta"]))
     print("Confusion Matrix:")
     print("  |TP={}|FN={}|".format(stats["confusion_mat"][0][0], stats["confusion_mat"][0][1]))
     print("  |FP={}|TN={}|".format(stats["confusion_mat"][1][0], stats["confusion_mat"][1][1]))
@@ -149,6 +149,7 @@ def write_stats(stats, params, outfile):
         file.write("-------------- Stats --------------\n")
         file.write("Gain Ratio: {}\n".format(params["gain_ratio"]))
         file.write("Threshold: {}\n".format(params["threshold"]))
+        file.write("Beta: {}\n".format(params["beta"]))
         file.write("Confusion Matrix:\n")
         file.write("  |TP={}|FN={}|\n".format(stats["confusion_mat"][0][0], stats["confusion_mat"][0][1]))
         file.write("  |FP={}|TN={}|\n".format(stats["confusion_mat"][1][0], stats["confusion_mat"][1][1]))
@@ -220,6 +221,7 @@ if __name__ == "__main__":
     parser.add_argument("data_file", help="csv file containing numeric data")
     parser.add_argument("--gratio", action='store_true', help="specify if information gain ratio is to be used, else regular information gain")
     parser.add_argument("--threshold", help="specify threshold, else hardcoded value will be used")
+    parser.add_argument("--beta", help="specify beta for use in the f-measure, else 1 will be used (>1 favors recall, <1 favors precision)")
     parser.add_argument("--plot", action='store_true', help="specify to plot thresholds/gain ratio")
     args = parser.parse_args()
 
@@ -229,6 +231,10 @@ if __name__ == "__main__":
         params["threshold"] = float(args.threshold)
     else:
         params["threshold"] = 0.01
+    if args.beta:
+        params["beta"] = float(args.beta)
+    else:
+        params["beta"] = 1
 
     schema = parse_schema(args.schema_file)
     data, attributes, category = parse_data(args.data_file)
@@ -237,6 +243,6 @@ if __name__ == "__main__":
     if args.plot:
         plot(0.2, 0.00, data, attributes, target)
     else:
-        stats = cross_validate(data, attributes, target, params["threshold"], params["gain_ratio"])
+        stats = cross_validate(data, attributes, target, params["threshold"], params["gain_ratio"], params["beta"])
         print_stats(stats, params)
 
