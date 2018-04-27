@@ -34,7 +34,7 @@ def to_dict(node):
    d = {}
 
    return d
-   
+
 def to_json(node):
    raise "NYI"
 
@@ -47,7 +47,7 @@ def dominant_class(D):
             classes[d[1]] = 1
     return max(classes)
 
-def generate(D, A, threshold):
+def generate(D, A, threshold, gain_ratio):
     klass = D[0][1]
     if all(d[1] == klass for d in D):
         return Node("class", klass)
@@ -55,7 +55,7 @@ def generate(D, A, threshold):
         klass = dominant_class(D)
         return Node("class", klass)
     else:
-        selected_attr, selected_idx = selectSplittingAttribute(A,D,threshold)
+        selected_attr, selected_idx = selectSplittingAttribute(A,D,threshold, gain_ratio)
         if not selected_idx:
             klass = dominant_class(D)
             return Node("class", klass)
@@ -71,6 +71,6 @@ def generate(D, A, threshold):
         for e in range(1, selected[1] + 1):
             new_data = [d for d in D if d[0][selected_idx] == e]
             if new_data:
-                node.children[e] = generate(new_data, list(A), threshold)
+                node.children[e] = generate(new_data, list(A), threshold, gain_ratio)
         return node
 
