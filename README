@@ -1,0 +1,27 @@
+This project is incomplete due to poor planning, coordination, and understanding of the lab spec. The single program parser.py runs cross-validation on the files from the ELECTIONS dataset reporting the following statistics:
+- Parameters used (gain ratio, threshold, beta)
+- Confusion Matrix
+- Precision
+- Recall
+- F-measure
+- Overall accuracy
+- Average accuracy
+
+There is no random-forest classifier, it does not handle the IRIS dataset, and is unable to handle numerical attributes. It also does not write the model to a file, instead keeping building it in memory and using that for classification/cross-validation.
+
+The program parser.py can be run with the options described below to perform 10-fold cross-validation on generated decision trees.
+It reports various statistics based on the result of this cross validation.
+
+The required command line parameters for parser.py are:
+* [schema_file] xml file that contains the names for the elections dataset (domain.xml)
+* [data_file] csv file that contains data in numbers format (tree0X-XXXX-numbers.csv)
+
+The optional parameters that parser.py accepts are as follows:
+* [-h] for help
+* [--gratio] for using information gain-ratio else will use information gain.
+* [--threshold VALUE] for specifying the threshold value to be used (DEFAULT=0.01)
+* [--beta VALUE] for specifiying the value of beta to use when calculating f-measure (DEFAULT=1)
+* [--plot] to plot various values of threshold against information gain and information gain ratio. Note that this generates plot/text files and requires matplotlib.
+
+
+
