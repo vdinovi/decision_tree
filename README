@@ -7,6 +7,8 @@ This project is incomplete due to poor planning, coordination, and understanding
 - Overall accuracy
 - Average accuracy
 
+example run: python evaluate.py --gratio --threshold 0.0001 --beta 0.8 ../dataset/domain.xml ../dataset/tree01-1000-numbers.csv
+
 There is no random-forest classifier, it does not handle the IRIS dataset, and is unable to handle numerical attributes. It also does not write the model to a file, instead keeping building it in memory and using that for classification/cross-validation.
 
 The program evaluate.py can be run with the options described below to perform 10-fold cross-validation on generated decision trees.
