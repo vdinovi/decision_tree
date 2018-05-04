@@ -114,6 +114,7 @@ def cross_validate(data, attributes, target, threshold, gain_ratio, beta):
         root = generate(train_set, attributes, threshold, gain_ratio)
         actual = [classify(d[0], attrs, root) for d in test_set]
         expected = [d[1] for d in test_set]
+        pdb.set_trace()
         confusion(confusion_mat, actual, expected)
         accuracies.append(accuracy(actual, expected))
     avg_accuracy = sum(accuracies) / float(len(accuracies))
@@ -161,8 +162,8 @@ def write_stats(stats, params, outfile):
         file.write("----------------------------------\n")
 
 
-def plot(max_thresh, min_thresh, data, attributes, target):
-    dt = 0.0005
+def plot(max_thresh, min_thresh, data, attributes, target, beta):
+    dt = 0.0001
     thresholds = []
     accuracy = []
     f_measure = []
@@ -170,7 +171,7 @@ def plot(max_thresh, min_thresh, data, attributes, target):
     # With Gain 
     with open("c45_gain.txt", "w") as file:
         while thresh >= min_thresh:
-            stats = cross_validate(data, attributes[:], target, thresh, False)
+            stats = cross_validate(data, attributes[:], target, thresh, False, beta)
             thresholds.append(thresh)
             accuracy.append(stats["average_accuracy"])
             f_measure.append(stats["f_measure"])
@@ -195,7 +196,7 @@ def plot(max_thresh, min_thresh, data, attributes, target):
     thresh = float(max_thresh)
     with open("c45_gain_ratio.txt", "w") as file:
         while thresh >= min_thresh:
-            stats = cross_validate(data, attributes[:], target, thresh, True)
+            stats = cross_validate(data, attributes[:], target, thresh, True, beta)
             thresholds.append(thresh)
             accuracy.append(stats["average_accuracy"])
             f_measure.append(stats["f_measure"])
@@ -241,7 +242,7 @@ if __name__ == "__main__":
     target = int(list(filter(lambda x: x["name"] == "Obama", schema[category]))[0]["type"])
     filename = "c45eval_{}.png".format("gain_ratio" if params["gain_ratio"] else "gain")
     if args.plot:
-        plot(0.2, 0.00, data, attributes, target)
+        plot(0.2, 0.00, data, attributes, target, params["beta"])
     else:
         stats = cross_validate(data, attributes, target, params["threshold"], params["gain_ratio"], params["beta"])
         print_stats(stats, params)
