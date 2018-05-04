@@ -6,7 +6,6 @@ import random
 from splitting import selectSplittingAttribute
 from tree import Node, print_tree, generate
 from pprint import pprint
-import matplotlib.pyplot as plt
 
 # Parse the schema XML file -> dictionary
 def parse_schema(filename):
@@ -162,6 +161,7 @@ def write_stats(stats, params, outfile):
 
 
 def plot(max_thresh, min_thresh, data, attributes, target):
+    import matplotlib.pyplot as plt
     dt = 0.0005
     thresholds = []
     accuracy = []
