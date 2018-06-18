@@ -114,7 +114,6 @@ def cross_validate(data, attributes, target, threshold, gain_ratio, beta):
         root = generate(train_set, attributes, threshold, gain_ratio)
         actual = [classify(d[0], attrs, root) for d in test_set]
         expected = [d[1] for d in test_set]
-        pdb.set_trace()
         confusion(confusion_mat, actual, expected)
         accuracies.append(accuracy(actual, expected))
     avg_accuracy = sum(accuracies) / float(len(accuracies))
